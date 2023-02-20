@@ -1,0 +1,18 @@
+[Unit]
+Description=TCE malachite agent for collecting system information
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+ExecStart=/root/tce/malachite/bin/static/run_agent
+Restart=always
+LimitMEMLOCK=infinity
+LimitNOFILE=infinity
+WorkingDirectory=/root/tce/malachite
+TimeoutSec=600
+MemoryLimit=4G
+CPUQuota=400%
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<url name=""></url>
+<port name="80"></port>
+<byteperf name="basic" description="This module will collect the basic performance data of your system, you can use it to check the basic micro-architecutre performance of your system.">
+
+    <module name="cpu">
+        <group name="Utilization">
+            <event name="a">INSTRUCTION_RETIRED</event>
+            <event name="b">UNHALTED_REFERENCE_CYCLES</event>
+            <event name="c">UNHALTED_CORE_CYCLES</event>
+            <variable name="d">TSC</variable>
+            <event name="e">MEM_LOAD_UOPS_RETIRED.L3_MISS</event>
+            <metric name="Utilization">(100*b)/d</metric>
+            <metric name="CPI">c/a</metric>
+            <metric name="Instructions">a</metric>
+            <metric name="Cycles">c</metric>
+            <metric name="L3_Misses">e</metric>
+        </group>
+    </module>
+
+    <module name="power">
+        <group name="Energy">
+            <variable name="a">PACKAGE_ENERGY</variable>
+            <variable name="b">DRAM_ENERGY</variable>
+            <constant name="c">system.package_energy_limit</constant>
+            <constant name="d">system.dram_energy_limit</constant>
+            <variable name="e">RUNTIME</variable>
+            <variable name="f">APERF</variable>
+            <variable name="g">MPERF</variable>
+            <variable name="h">TSC</variable>
+            <metric name="Package_Energy">a/(1000*e)</metric>
+            <metric name="Dram_Energy">b/(1000*e)</metric>
+            <metric name="Package_Energy_Limit">c</metric>
+            <metric name="Dram_Energy_Limit">d</metric>
+            <metric name="Base_Freq" unit="GHz">h/(1000000*e)</metric>
+            <metric name="Runtime_Freq" unit="GHz">(h*f)/(g*e*1000000)</metric>
+        </group>
+    </module>
+
+    <module name="uncore_imc">
+        <group name="Bandwidth">
+            <event name="a">UNC_M_DCLOCKTICKS</event>
+            <event name="b">UNC_M_CAS_COUNT.RD</event>
+            <event name="c">UNC_M_CAS_COUNT.WR</event>
+            <variable name="d">RUNTIME</variable>
+            <metric name="Memory_Read_Bandwidth">((64*b)/(d/1000))/1000000</metric>
+            <metric name="Memory_Write_Bandwidth">((64*c)/(d/1000))/1000000</metric>
+            <metric name="Memory_Total_Bandwidth">((64*(b+c))/(d/1000))/1000000</metric>
+            <metric name="Memory_Max_Bandwidth">((8*2*a)/(d/1000))/1000000</metric>
+            <metric name="Memory_Bandwidth_Util">100*(64*(b+c))/(8*2*a)</metric>
+        </group>
+    </module>
+
+    <module name="uncore_qpi">
+        <group name="Bandwidth">
+            <event name="a">UNC_Q_CLOCKTICKS</event>
+            <event name="b">UNC_Q_TXL_FLITS_G0.DATA</event>
+            <event name="c">UNC_Q_TXL_FLITS_G0.NON_DATA</event>
+            <variable name="f">RUNTIME</variable>>
+            <metric name="UPI_TX_Bandwidth">8*b/(1000000*f)</metric>
+            <metric name="UPI_TX_Bandwidth_Util">100*(b+c)/(a)</metric>
+        </group>
+        <group name="Latency">
+            <event name="a">UNC_Q_CLOCKTICKS</event>
+            <event name="d">UNC_Q_TXL_OCCUPANCY</event>
+            <event name="e">UNC_Q_TXL_INSERTS</event>
+            <variable name="f">RUNTIME</variable>
+            <metric name="UPI_TX_Latency">(1000000000*(d/e))/(a/(f/1000))</metric>
+        </group>
+    </module>
+
+</byteperf>

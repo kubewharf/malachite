@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<url name=""></url>
+<port name="80"></port>
+<byteperf name="basic" description="This module will collect the basic performance data of your system, you can use it to check the basic micro-architecutre performance of your system.">
+
+    <module name="cpu">
+        <group name="Utilization">
+            <event name="a">RETIRED_INSTRUCTIONS</event>
+            <event name="b">CYCLES_NOT_IN_HALT</event>
+            <event name="c">RETIRED_INSTRUCTIONS:K</event>
+            <event name="d">CYCLES_NOT_IN_HALT:K</event>
+            <variable name="e">APERF</variable>
+            <variable name="f">MPERF</variable>
+            <variable name="g">TSC</variable>
+            <metric name="Utilization">(100*b)/(g*e/f)</metric>
+            <metric name="CPI">b/a</metric>
+            <metric name="Instructions">a</metric>
+            <metric name="Cycles">b</metric>
+        </group>
+    </module>
+
+    <module name="power">
+        <group name="Energy">
+            <variable name="a">PACKAGE_ENERGY</variable>
+            <variable name="b">CORE_ENERGY</variable>
+            <variable name="c">RUNTIME</variable>
+            <variable name="d">APERF</variable>
+            <variable name="e">MPERF</variable>
+            <variable name="f">TSC</variable>
+            <metric name="Base_Freq" unit="GHz">f/(c*1000000)</metric>
+            <metric name="Runtime_Freq" unit="GHz">(f*d)/(e*c*1000000)</metric>
+            <metric name="Package_Energy">a/(1000*c)</metric>
+            <metric name="Core_Energy">b/(1000*c)</metric>
+        </group>
+    </module>
+
+    <module name="amd_df">
+        <group name="Memory_Bandwidth_Read">
+            <event name="a">DDR_CHANNEL_A.READ</event>
+            <event name="b">DDR_CHANNEL_B.READ</event>
+            <event name="c">DDR_CHANNEL_C.READ</event>
+            <event name="d">DDR_CHANNEL_D.READ</event>
+            <event name="e">DDR_CHANNEL_E.READ</event>
+            <event name="f">DDR_CHANNEL_F.READ</event>
+            <event name="g">DDR_CHANNEL_G.READ</event>
+            <event name="h">DDR_CHANNEL_H.READ</event>
+            <variable name="i">RUNTIME</variable>
+            <metric name="Memory_Read_Bandwidth_Channela">((64*a)/(i/1000))/1000000</metric>
+            <metric name="Memory_Read_Bandwidth_Channelb">((64*b)/(i/1000))/1000000</metric>
+            <metric name="Memory_Read_Bandwidth_Channelc">((64*c)/(i/1000))/1000000</metric>
+            <metric name="Memory_Read_Bandwidth_Channeld">((64*d)/(i/1000))/1000000</metric>
+            <metric name="Memory_Read_Bandwidth_Channele">((64*e)/(i/1000))/1000000</metric>
+            <metric name="Memory_Read_Bandwidth_Channelf">((64*f)/(i/1000))/1000000</metric>
+            <metric name="Memory_Read_Bandwidth_Channelg">((64*g)/(i/1000))/1000000</metric>
+            <metric name="Memory_Read_Bandwidth_Channelh">((64*h)/(i/1000))/1000000</metric>
+        </group>
+        <group name="Memory_Bandwidth_Write">
+            <event name="a">DDR_CHANNEL_A.WRITE</event>
+            <event name="b">DDR_CHANNEL_B.WRITE</event>
+            <event name="c">DDR_CHANNEL_C.WRITE</event>
+            <event name="d">DDR_CHANNEL_D.WRITE</event>
+            <event name="e">DDR_CHANNEL_E.WRITE</event>
+            <event name="f">DDR_CHANNEL_F.WRITE</event>
+            <event name="g">DDR_CHANNEL_G.WRITE</event>
+            <event name="h">DDR_CHANNEL_H.WRITE</event>
+            <variable name="i">RUNTIME</variable>
+            <metric name="Memory_Write_Bandwidth_Channela">((64*a)/(i/1000))/1000000</metric>
+            <metric name="Memory_Write_Bandwidth_Channelb">((64*b)/(i/1000))/1000000</metric>
+            <metric name="Memory_Write_Bandwidth_Channelc">((64*c)/(i/1000))/1000000</metric>
+            <metric name="Memory_Write_Bandwidth_Channeld">((64*d)/(i/1000))/1000000</metric>
+            <metric name="Memory_Write_Bandwidth_Channele">((64*e)/(i/1000))/1000000</metric>
+            <metric name="Memory_Write_Bandwidth_Channelf">((64*f)/(i/1000))/1000000</metric>
+            <metric name="Memory_Write_Bandwidth_Channelg">((64*g)/(i/1000))/1000000</metric>
+            <metric name="Memory_Write_Bandwidth_Channelh">((64*h)/(i/1000))/1000000</metric>
+        </group>
+        <group name="Xmgi_Outbound">
+            <event name="a">XGMI0.OUT</event>
+            <event name="b">XGMI1.OUT</event>
+            <event name="c">XGMI2.OUT</event>
+            <event name="d">XGMI3.OUT</event>
+            <variable name="e">RUNTIME</variable>
+            <metric name="Xmgi_TX_0_Bandwidth">((32*a)/(e/1000))/1000000</metric>
+            <metric name="Xmgi_TX_1_Bandwidth">((32*b)/(e/1000))/1000000</metric>
+            <metric name="Xmgi_TX_2_Bandwidth">((32*c)/(e/1000))/1000000</metric>
+            <metric name="Xmgi_TX_3_Bandwidth">((32*d)/(e/1000))/1000000</metric>
+        </group>
+    </module>
+    <module name="amd_l3">
+        <group name="L3Cache">
+            <event name="a">CACHE.ACCESS</event>
+            <event name="b">CACHE.MISS</event>
+            <event name="c">MISS_INSERT.ALL</event>
+            <event name="d">MISS_OCCUPY</event>
+            <metric name="L3_Miss_Ratio">100*b/a</metric>
+            <metric name="L3_Read_Miss_Latency">d*16/c</metric>
+        </group>
+    </module>
+</byteperf>

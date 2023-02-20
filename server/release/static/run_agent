@@ -1,0 +1,36 @@
+#!/bin/bash
+
+function setup_env {
+    # export RUST_BACKTRACE=full
+    export ROCKET_CONFIG=/root/tce/malachite/bin/static/Rocket.toml
+}
+
+function clear_kprobes {
+    ps -ef | grep "malachite"| grep -v grep | grep -v malachite-reporter | awk '{print $2}' | xargs -I pid kill pid
+    sleep 3
+    local kprobe_directory="/sys/kernel/debug/tracing/events/kprobes/"
+    if [ -d $kprobe_directory ]; then
+
+        for kprobe in `find $kprobe_directory -name enable| grep libbpf`; do
+            if [ $(cat $kprobe) = "1" ]; then
+                echo 0 > $kprobe
+            fi
+        done
+    fi
+
+    # echo > /sys/kernel/debug/tracing/kprobe_events
+    for kprobe in `cat /sys/kernel/debug/tracing/kprobe_events | grep libbpf`; do
+        kname=$(echo $kprobe | awk '{print $1}' | awk -F\: '{print $2}')
+        if [ ! -z $kname ]; then
+            echo '-:'$kname >> /sys/kernel/debug/tracing/kprobe_events
+        fi
+    done
+}
+
+function  start_malachite_core {
+    exec /root/tce/malachite/bin/malachite
+}
+
+setup_env
+clear_kprobes
+start_malachite_core

@@ -1,0 +1,8 @@
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+carma_br0: 17477117943 190479148    0    0    0     0          0         0 468290113624 131093781    0    0    0     0       0          0
+carma_vxlan0: 461890920 7698182    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+    lo: 80384677192719 8962581383    0    0    0     0          0         0 80384677192719 8962581383    0    0    0     0       0          0
+  eth2: 78096123  596786    0    0    0     0          0   9555146 10593158   50043    0    0    0     0       0          0
+  eth0: 716185978781320 603422604780    0 51256    0     0          0   9555149 503717083334762 472968393701    0    0    0     0       0          0
+ bond0:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0

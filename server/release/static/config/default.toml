@@ -1,0 +1,36 @@
+enable = true
+
+[proc]
+enable = true
+cpu = { enable = true, interval = 10 }
+mem = { enable = true, interval = 10 }
+storage = { enable = true, interval = 10 }
+net = { enable = true, interval = 10 }
+
+[sys]
+enable = true
+cpu = { enable = true, interval = 10 }
+mem = { enable = true, interval = 10 }
+storage = { enable = true, interval = 10 }
+net = { enable = true, interval = 10 }
+
+[byteperf]
+enable = false
+cpu = { enable = true, interval = 10 }
+mem = { enable = true, interval = 10 }
+storage = { enable = true, interval = 10 }
+net = { enable = true, interval = 10 }
+
+[ebpf]
+enable = true
+cpu = { enable = true, interval = 10 }
+mem = { enable = true, interval = 10 }
+storage = { enable = true, interval = 10 }
+net = { enable = false, interval = 10 }
+
+[cgroup]
+enable = true
+cpu = { enable = true, interval = 10 }
+mem = { enable = true, interval = 10 }
+storage = { enable = true, interval = 10 }
+net = { enable = true, interval = 10 }

@@ -1,0 +1,20 @@
+[package]
+name = "malachite"
+version = "0.1.0"
+authors = ["lihuaxuan<lihuaxuan@bytedance.com>"]
+edition = "2021"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lib = {path = "../lib"}
+rocket = { version = "0.5.0-rc.1", features = ["json"] }
+rocket-basicauth = "2"
+serde = {version = "1.0", features = ["derive"]}
+once_cell = "1.8.0"
+parking_lot = "0.11"
+crossbeam = "0.8"
+tokio = "1.13.1"
+log4rs = {version = "0.13.0", features = ["rolling_file_appender", "compound_policy", "size_trigger", "fixed_window_roller", "toml_format", "threshold_filter", "file"]}
+log = "0.4"

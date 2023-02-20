@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<url name=""></url>
+<port name="80"></port>
+<byteperf name="basic" description="This module will collect the basic performance data of your system, you can use it to check the basic micro-architecutre performance of your system.">
+
+    <module name="cpu">
+        <group name="Utilization">
+            <event name="a">INSTRUCTION_RETIRED</event>
+            <event name="b">UNHALTED_REFERENCE_CYCLES</event>
+            <event name="c">UNHALTED_CORE_CYCLES</event>
+            <variable name="d">TSC</variable>
+            <event name="e">MEM_LOAD_RETIRED.L3_MISS</event>
+            <metric name="Utilization">(100*b)/d</metric>
+            <metric name="CPI">c/a</metric>
+            <metric name="Instructions">a</metric>
+            <metric name="Cycles">c</metric>
+            <metric name="L3_Misses">e</metric>
+        </group>
+    </module>
+
+    <module name="power">
+        <group name="Energy">
+            <variable name="a">PACKAGE_ENERGY</variable>
+            <variable name="b">DRAM_ENERGY</variable>
+            <constant name="c">system.package_energy_limit</constant>
+            <constant name="d">system.dram_energy_limit</constant>
+            <variable name="e">RUNTIME</variable>
+            <variable name="f">APERF</variable>
+            <variable name="g">MPERF</variable>
+            <variable name="h">TSC</variable>
+            <metric name="Package_Energy">a/(1000*e)</metric>
+            <metric name="Dram_Energy">b/(1000*e)</metric>
+            <metric name="Package_Energy_Limit">c</metric>
+            <metric name="Dram_Energy_Limit">d</metric>
+            <metric name="Base_Freq" unit="GHz">h/(1000000*e)</metric>
+            <metric name="Runtime_Freq" unit="GHz">(h*f)/(g*e*1000000)</metric>
+        </group>
+    </module>
+
+    <module name="uncore_iio">
+        <group name="Bandwidth_Latency">
+            <event name="a">UNC_IO_CLOCKTICKS</event>
+            <event name="b">UNC_IO_COMP_BUF_INSERTS.PORT0</event>
+            <event name="c">UNC_IO_COMP_BUF_OCCUPANCY.PORT0</event>
+            <event name="d">UNC_IO_COMP_BUF_INSERTS.PORT1</event>
+            <event name="e">UNC_IO_COMP_BUF_OCCUPANCY.PORT1</event>
+            <event name="f">UNC_IO_COMP_BUF_INSERTS.PORT2</event>
+            <event name="g">UNC_IO_COMP_BUF_OCCUPANCY.PORT2</event>
+            <event name="h">UNC_IO_COMP_BUF_INSERTS.PORT3</event>
+            <event name="i">UNC_IO_COMP_BUF_OCCUPANCY.PORT3</event>
+            <variable name="j">IO_PORT0_BW_IN</variable>
+            <variable name="k">IO_PORT1_BW_IN</variable>
+            <variable name="l">IO_PORT2_BW_IN</variable>
+            <variable name="m">IO_PORT3_BW_IN</variable>
+            <variable name="n">IO_PORT0_BW_OUT</variable>
+            <variable name="o">IO_PORT1_BW_OUT</variable>
+            <variable name="p">IO_PORT2_BW_OUT</variable>
+            <variable name="q">IO_PORT3_BW_OUT</variable>
+            <variable name="r">RUNTIME</variable>
+            <metric name="P0_Read_BW">(4*j)/(1000*r)</metric>
+            <metric name="P1_Read_BW">(4*k)/(1000*r)</metric>
+            <metric name="P2_Read_BW">(4*l)/(1000*r)</metric>
+            <metric name="P3_Read_BW">(4*m)/(1000*r)</metric>
+            <metric name="P0_Write_BW">(4*n)/(1000*r)</metric>
+            <metric name="P1_Write_BW">(4*o)/(1000*r)</metric>
+            <metric name="P2_Write_BW">(4*p)/(1000*r)</metric>
+            <metric name="P3_Write_BW">(4*q)/(1000*r)</metric>
+            <metric name="P0_Latency">(1000000000*(c/b))/(a/(r/1000))</metric>
+            <metric name="P1_Latency">(1000000000*(e/d))/(a/(r/1000))</metric>
+            <metric name="P2_Latency">(1000000000*(g/f))/(a/(r/1000))</metric>
+            <metric name="P3_Latency">(1000000000*(i/h))/(a/(r/1000))</metric>
+        </group>
+    </module>
+
+    <module name="uncore_imc">
+        <group name="Bandwidth">
+            <event name="a">UNC_M_DCLOCKTICKS</event>
+            <event name="b">UNC_M_CAS_COUNT.RD</event>
+            <event name="c">UNC_M_CAS_COUNT.WR</event>
+            <variable name="d">RUNTIME</variable>
+            <metric name="Memory_Read_Bandwidth">((64*b)/(d/1000))/1000000</metric>
+            <metric name="Memory_Write_Bandwidth">((64*c)/(d/1000))/1000000</metric>
+            <metric name="Memory_Total_Bandwidth">((64*(b+c))/(d/1000))/1000000</metric>
+            <metric name="Memory_Max_Bandwidth">((8*2*a)/(d/1000))/1000000</metric>
+            <metric name="Memory_Bandwidth_Util">100*(64*(b+c))/(8*2*a)</metric>
+        </group>
+        <group name="Read_Latency">
+            <event name="a">UNC_M_CLOCKTICKS</event>
+            <event name="b">UNC_M_RPQ_INSERTS</event>
+            <event name="c">UNC_M_RPQ_OCCUPANCY</event>
+            <variable name="d">RUNTIME</variable>
+            <metric name="Memory_Read_Latency">(1000000000*(c/b))/(a/(d/1000))</metric>
+        </group>
+        <group name="Write_Latency">
+            <event name="a">UNC_M_CLOCKTICKS</event>
+            <event name="b">UNC_M_WPQ_INSERTS</event>
+            <event name="c">UNC_M_WPQ_OCCUPANCY</event>
+            <variable name="d">RUNTIME</variable>
+            <metric name="Memory_Write_Latency">(1000000000*(c/b))/(a/(d/1000))</metric>
+        </group>
+    </module>
+
+    <module name="uncore_upi">
+        <group name="Bandwidth">
+            <event name="a">UNC_UPI_RXL_FLITS.ALL_DATA</event>
+            <event name="b">UNC_UPI_TXL_FLITS.ALL_DATA</event>
+            <variable name="c">RUNTIME</variable>>
+            <metric name="UPI_RX_Bandwidth">64*a/(9*1000000*c)</metric>
+            <metric name="UPI_TX_Bandwidth">64*b/(9*1000000*c)</metric>
+        </group>
+        <group name="Latency">
+            <event name="a">UNC_UPI_CLOCKTICKS</event>
+            <event name="b">UNC_UPI_RXL_INSERTS</event>
+            <event name="c">UNC_UPI_RXL_OCCUPANCY</event>
+            <event name="d">UNC_UPI_TXL_INSERTS</event>
+            <event name="e">UNC_UPI_TXL_OCCUPANCY</event>
+            <variable name="f">RUNTIME</variable>
+            <metric name="UPI_RX_Latency">(1000000000*(c/b))/(a/(f/1000))</metric>
+            <metric name="UPI_TX_Latency">(1000000000*(e/d))/(a/(f/1000))</metric>
+        </group>
+    </module>
+
+</byteperf>

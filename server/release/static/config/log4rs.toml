@@ -1,0 +1,14 @@
+[appenders.stdout]
+kind = "console"
+filters = [ { kind = "threshold", level = "error" } ]
+encoder = { pattern = "{d} - [{l}] {f}:{L} {m}{n}" }
+
+[appenders.log_file]
+kind = "rolling_file"
+path = "/var/log/malachite/malachite.log"
+filters = [ { kind = "threshold", level = "info" } ]
+encoder = { pattern = "{d} - [{l}] {f}:{L} {m}{n}" }
+policy = { kind = "compound", trigger = { kind = "size", limit = "150mb" }, roller = { kind = "fixed_window", pattern = "/var/log/malachite/malachite.log.{}", base = 1, count = 6} }
+
+[root]
+appenders = ["stdout", "log_file"]

@@ -1,0 +1,8 @@
+Name: "byteperf"
+ExecStart: "/etc/sysop/byteperf/byteperf count -d 1000 -i 1000 --num=20 --format=post"
+ExecStop: ""
+RunMode: "interval"
+IntervalModeConfig:
+  Timeout: "60s"
+  Interval: "300s"
+

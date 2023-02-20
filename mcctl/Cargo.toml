@@ -1,0 +1,11 @@
+[package]
+name = "mcctl"
+version = "0.1.0"
+authors = ["lihuaxuan <lihuaxuan@bytedance.com>"]
+edition = "2021"
+build = "build.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "3.0.0-beta.4"

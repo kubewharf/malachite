@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<url name=""></url>
+<port name="80"></port>
+<byteperf name="basic" description="This module will collect the basic performance data of your system, you can use it to check the basic micro-architecutre performance of your system.">
+
+    <module name="cpu">
+        <group name="Utilization">
+            <event name="a">INST_RETIRED</event>
+            <event name="b">CPU_CYCLES</event>
+            <variable name="c">TSC</variable>
+            <metric name="Utilization">(100*b)/c</metric>
+            <metric name="CPI">b/a</metric>
+            <metric name="Instructions">a</metric>
+            <metric name="Cycles">b</metric>
+        </group>
+    </module>
+    <module name="xp-mcu">
+        <group name="Bandwidth">
+            <variable name="a">MCU_UPLOAD</variable>
+            <variable name="b">MCU_DOWNLOAD</variable>
+            <constant name="c">DDR_FREQ</constant>
+            <variable name="d">RUNTIME</variable>
+            <metric name="Memory_Read_Bandwidth">((32*a)/(d/1000))/1000000</metric>
+            <metric name="Memory_Write_Bandwidth">((32*b)/(d/1000))/1000000</metric>
+            <metric name="Memory_Total_Bandwidth">((32*(a+b))/(d/1000))/1000000</metric>
+            <metric name="Memory_Bandwidth_Util">100*(32*(a+b)/(d/1000))/(8*c)</metric>
+        </group>
+    </module>
+    <module name="xp-ccix">
+        <group name="Bandwidth">
+            <variable name="a">CCIX_UPLOAD</variable>
+            <variable name="b">CCIX_DOWNLOAD</variable>
+            <variable name="c">RUNTIME</variable>
+            <metric name="CCIX_RX_Bandwidth">((32*a)/(c/1000))/1000000</metric>
+            <metric name="CCIX_TX_Bandwidth">((32*b)/(c/1000))/1000000</metric>
+            <metric name="CCIX_Total_Bandwidth">((32*(a+b))/(c/1000))/1000000</metric>
+        </group>
+    </module>
+    <module name="xp-pcie">
+        <group name="Bandwidth">
+            <variable name="a">PCIE_UPLOAD</variable>
+            <variable name="b">PCIE_DOWNLOAD</variable>
+            <variable name="c">RUNTIME</variable>
+            <metric name="IIO_Read_Bandwidth">((32*a)/(c/1000))/1000000</metric>
+            <metric name="IIO_Write_Bandwidth">((32*b)/(c/1000))/1000000</metric>
+            <metric name="IIO_Total_Bandwidth">((32*(a+b))/(c/1000))/1000000</metric>
+        </group>
+    </module>
+</byteperf>

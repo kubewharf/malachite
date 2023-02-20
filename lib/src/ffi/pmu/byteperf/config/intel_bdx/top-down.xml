@@ -1,0 +1,205 @@
+<?xml version="1.0"?>
+<byteperf name="top-down" description="This module will collect the top-down performance data of your system. The top-down microarchitecture analysis method based on the top-down characterization methodology aims to provide an insight into whether you have made wise choices with your algorithms and data structures.">
+
+    <module name="cpu">
+        <group name="Top-Down">
+            <event name="a">UNHALTED_CORE_CYCLES:T</event>
+            <event name="b">IDQ_UOPS_NOT_DELIVERED.CORE</event>
+            <event name="c">UOPS_RETIRED.RETIRE_SLOTS</event>
+            <event name="d">INT_MISC.RECOVERY_CYCLES_ANY</event>
+            <event name="e">UOPS_ISSUED.ANY</event>
+            <constant name="f">system.hyper_threads</constant>
+            <metric name="Frontend_Bound">(100*b)/(4*a/f)</metric>
+            <metric name="Bad_Speculation">(100*(e-c+(4*d/f)))/(4*a/f)</metric>
+            <metric name="Backend_Bound">100-(100*(e+(4*d/f)+b))/(4*a/f)</metric>
+            <metric name="Retiring">(100*c)/(4*a/f)</metric>
+        </group>
+        <group name="Frontend_Bound">
+            <event name="a">UNHALTED_CORE_CYCLES:T</event>
+            <event name="b">IDQ_UOPS_NOT_DELIVERED.CORE</event>
+            <event name="c">IDQ_UOPS_NOT_DELIVERED.CYCLES_0_UOPS_DELIV_CORE</event>
+            <constant name="d">system.hyper_threads</constant>
+            <metric name="Frontend_Latency">(100*c)/(a/d)</metric>
+            <metric name="Frontend_Bandwidth">(100*(b-4*c))/(4*a/d)</metric>
+        </group>
+        <group name="Frontend_Latency">
+            <event name="a">UNHALTED_CORE_CYCLES</event>
+            <event name="b">ICACHE.IFDATA_STALL</event>
+            <event name="c">ITLB_MISSES.STLB_HIT</event>
+            <event name="d">ITLB_MISSES.WALK_COMPLETED</event>
+            <event name="e">ITLB_MISSES.WALK_DURATION_C1</event>
+            <event name="f">BR_MISP_RETIRED.ALL_BRANCHES</event>
+            <event name="g">MACHINE_CLEARS.COUNT</event>
+            <event name="h">BACLEARS.ANY</event>
+            <event name="i">DSB2MITE_SWITCHES.PENALTY_CYCLES</event>
+            <event name="j">IDQ.MS_SWITCHES</event>
+            <event name="k">RS_EVENTS.EMPTY_CYCLES</event>
+            <event name="l">RS_EVENTS.EMPTY_END</event>
+            <metric name="ICache_Misses">100*b/a</metric>
+            <metric name="ITLB_Misses">100*(14*c+7*d+e)/a</metric>
+            <metric name="Branch_Resteers">100*((k-b-(14*c+7*d+e))/l)*(f+g+h)/a</metric>
+            <metric name="Mispredicts_Resteers">100*(b/(b+g+h))*((k-b-(14*c+7*d+e))/l)*(f+g+h)/a</metric>
+            <metric name="Clears_Resteers">100*(g/(b+g+h))*((k-b-(14*c+7*d+e))/l)*(f+g+h)/a</metric>
+            <metric name="Unknown_Branches">100*(h/(b+g+h))*((k-b-(14*c+7*d+e))/l)*(f+g+h)/a</metric>
+            <metric name="DSB_Switches">100*i/a</metric>
+            <metric name="MS_Switches">100*2*j/a</metric>
+        </group>
+        <group name="Frontend_Bandwidth">
+            <event name="a">UNHALTED_CORE_CYCLES</event>
+            <event name="b">IDQ.ALL_MITE_CYCLES_ANY_UOPS</event>
+            <event name="c">IDQ.ALL_MITE_CYCLES_4_UOPS</event>
+            <event name="d">IDQ.ALL_DSB_CYCLES_ANY_UOPS</event>
+            <event name="e">IDQ.ALL_DSB_CYCLES_4_UOPS</event>
+            <event name="f">LSD.ACTIVE</event>
+            <event name="g">LSD.CYCLES_4_UOPS</event>
+            <metric name="MITE">100*(b-c)/a</metric>
+            <metric name="DSB">100*(d-e)/a</metric>
+            <metric name="LSD">100*(f-g)/a</metric>
+        </group>
+        <group name="Bad_Speculation">
+            <event name="a">UNHALTED_CORE_CYCLES</event>
+            <event name="e">UOPS_ISSUED.ANY</event>
+            <event name="f">UOPS_RETIRED.RETIRE_SLOTS</event>
+            <event name="g">INT_MISC.RECOVERY_CYCLES_ANY</event>
+            <event name="h">BR_MISP_RETIRED.ALL_BRANCHES</event>
+            <event name="i">MACHINE_CLEARS.COUNT</event>
+            <constant name="j">system.hyper_threads</constant>
+            <metric name="Branch_Mispredicts">(100*(h/(h+i))*(e-f+(4*g/j)))/(4*a/j)</metric>
+            <metric name="Machine_Clears">(100*(i/(h+i))*(e-f+(4*g/j)))/(4*a/j)</metric>
+        </group>
+        <group name="Backend_Bound">
+            <event name="a">IDQ_UOPS_NOT_DELIVERED.CORE</event>
+            <event name="b">UOPS_ISSUED.ANY</event>
+            <event name="c">INT_MISC.RECOVERY_CYCLES_ANY</event>
+            <event name="d">UNHALTED_CORE_CYCLES:T</event>
+            <event name="e">UOPS_RETIRED.RETIRE_SLOTS</event>
+            <event name="f">CYCLE_ACTIVITY.STALLS_MEM_ANY</event>
+            <event name="g">RESOURCE_STALLS.SB</event>
+            <event name="h">CYCLE_ACTIVITY.STALLS_TOTAL</event>
+            <event name="i">UOPS_EXECUTED.CYCLES_GE_1_UOP_EXEC</event>
+            <event name="j">UOPS_EXECUTED.CYCLES_GE_2_UOPS_EXEC</event>
+            <event name="k">UOPS_EXECUTED.CYCLES_GE_3_UOPS_EXEC</event>
+            <event name="l">IDQ_UOPS_NOT_DELIVERED.CYCLES_0_UOPS_DELIV_CORE</event>
+            <event name="m">UNHALTED_CORE_CYCLES</event>
+            <event name="n">INSTRUCTION_RETIRED</event>
+            <event name="o">RS_EVENTS.EMPTY_CYCLES</event>
+            <constant name="p">system.hyper_threads</constant>
+            <metric name="Memory_Bound">100*(1-((b-e+4*(c/p)+a+e)/(4*d/p)))*(f+g)/(h+i-cops((m/n),1.8,k,j)-cops((l/d),0.1,o,0))</metric>
+            <metric name="Core_Bound">100*(1-((b-e+4*(c/p)+a+e)/(4*d/p)))*(1-((f+g)/(h+i-cops((m/n),1.8,k,j)-cops((l/d),0.1,o,0))))</metric>
+        </group>
+        <group name="Memory_Bound">
+            <event name="a">UNHALTED_CORE_CYCLES</event>
+            <event name="b">CYCLE_ACTIVITY.STALLS_MEM_ANY</event>
+            <event name="c">CYCLE_ACTIVITY.STALLS_L1D_MISS</event>
+            <event name="d">CYCLE_ACTIVITY.STALLS_L2_MISS</event>
+            <event name="e">CYCLE_ACTIVITY.STALLS_L3_MISS</event>
+            <event name="g">MEM_LOAD_UOPS_RETIRED.L3_HIT</event>
+            <event name="h">MEM_LOAD_UOPS_RETIRED.L3_MISS</event>
+            <event name="i">RESOURCE_STALLS.SB</event>
+            <metric name="L1_Bound">100*(b-c)/a</metric>
+            <metric name="L2_Bound">100*(c-d)/a</metric>
+            <metric name="L3_Bound">100*(d-e)/a</metric>
+            <metric name="MEM_Bound">100*(1-(g/(g+7*h)))*(d/a)</metric>
+            <metric name="Stores_Bound">100*i/a</metric>
+        </group>
+        <group name="L1_Bound">
+            <event name="a">UNHALTED_CORE_CYCLES</event>
+            <event name="b">DTLB_LOAD_MISSES.STLB_HIT</event>
+            <event name="c">DTLB_LOAD_MISSES.WALK_DURATION_C1</event>
+            <event name="d">DTLB_LOAD_MISSES.WALK_COMPLETED</event>
+            <event name="e">LD_BLOCKS.STORE_FORWARD</event>
+            <event name="f">MEM_UOPS_RETIRED.LOCK_LOADS</event>
+            <event name="g">MEM_UOPS_RETIRED.ALL_STORES</event>
+            <event name="h">OFFCORE_REQUESTS_OUTSTANDING.DEMAND_RFO_CYCLES</event>
+            <metric name="DTLB_Load">100*(8*b+c+7*d)/a</metric>
+            <metric name="Store_Fwd_Blk">100*((13*e)/a)</metric>
+            <metric name="Lock_Latency">100*(((f/g)*cops(a,h,h,a))/a)</metric>
+        </group>
+        <group name="L3_Bound">
+            <event name="a">UNHALTED_CORE_CYCLES</event>
+            <event name="b">MEM_LOAD_UOPS_RETIRED.L2_HIT</event>
+            <event name="c">MEM_LOAD_UOPS_RETIRED.L3_HIT</event>
+            <event name="d">MEM_LOAD_UOPS_L3_HIT_RETIRED.XSNP_HIT</event>
+            <event name="e">MEM_LOAD_UOPS_L3_HIT_RETIRED.XSNP_HITM</event>
+            <event name="f">MEM_LOAD_UOPS_L3_HIT_RETIRED.XSNP_MISS</event>
+            <event name="g">MEM_LOAD_UOPS_L3_MISS_RETIRED.LOCAL_DRAM</event>
+            <event name="h">MEM_LOAD_UOPS_L3_MISS_RETIRED.REMOTE_DRAM</event>
+            <event name="i">MEM_LOAD_UOPS_L3_MISS_RETIRED.REMOTE_HITM</event>
+            <event name="j">MEM_LOAD_UOPS_L3_MISS_RETIRED.REMOTE_FWD</event>
+            <event name="k">MEM_LOAD_UOPS_RETIRED.HIT_LFB</event>
+            <event name="l">OFFCORE_REQUESTS_BUFFER.SQ_FULL</event>
+            <event name="m">UNHALTED_CORE_CYCLES:T</event>
+            <constant name="n">system.hyper_threads</constant>
+            <metric name="Contested_Accesses">100*(60*(e+f)*(1+k/(b+c+d+e+f+g+h+i+j))/a)</metric>
+            <metric name="Data_Sharing">100*(43*d*(1+k/(b+c+d+e+f+g+h+i+j))/a)</metric>
+            <metric name="L3_Latency">100*(41*c*(1+k/(b+c+d+e+f+g+h+i+j))/a)</metric>
+            <metric name="SQ_Full">100*(l/n)/(m/n)</metric>
+        </group>
+        <group name="MEM_Bound">
+            <event name="a">UNHALTED_CORE_CYCLES</event>
+            <event name="b">OFFCORE_REQUESTS_OUTSTANDING.ALL_DATA_RD_C4</event>
+            <event name="c">OFFCORE_REQUESTS_OUTSTANDING.DEMAND_DATA_RD_CYCLES</event>
+            <metric name="MEM_Bandwidth">100*cops(b,a,a,b)/a</metric>
+            <metric name="MEM_Latency">100*(cops(c,a,a,c)-cops(b,a,a,b))/a</metric>
+        </group>
+        <group name="Stores_Bound">
+            <event name="a">UNHALTED_CORE_CYCLES</event>
+            <event name="b">DTLB_STORE_MISSES.STLB_HIT</event>
+            <event name="c">DTLB_STORE_MISSES.WALK_DURATION_C1</event>
+            <metric name="DTLB_Store">100*(7*b+c)/(a)</metric>
+        </group>
+        <group name="Core_Bound">
+            <event name="a">INSTRUCTION_RETIRED</event>
+            <event name="b">UNHALTED_CORE_CYCLES:T</event>
+            <event name="c">ARITH.FPU_DIV_ACTIVE</event>
+            <event name="d">CYCLE_ACTIVITY.STALLS_MEM_ANY</event>
+            <event name="e">RESOURCE_STALLS.SB</event>
+            <event name="f">CYCLE_ACTIVITY.STALLS_TOTAL</event>
+            <event name="g">UOPS_EXECUTED.CYCLES_GE_1_UOP_EXEC</event>
+            <event name="h">UOPS_EXECUTED.CYCLES_GE_2_UOPS_EXEC</event>
+            <event name="i">UOPS_EXECUTED.CYCLES_GE_3_UOPS_EXEC</event>
+            <event name="j">IDQ_UOPS_NOT_DELIVERED.CYCLES_0_UOPS_DELIV_CORE</event>
+            <event name="k">RS_EVENTS.EMPTY_CYCLES</event>
+            <event name="l">UNHALTED_CORE_CYCLES</event>
+            <constant name="m">system.hyper_threads</constant>
+            <metric name="Divider">100*c/(b/m)</metric>
+            <metric name="Ports_Utilization">100*((f+g-(cops((a/l),1.8,i,h)-(cops(j/b/m,0.1,k,0))+e))-e-d)/l</metric>
+        </group>
+        <group name="Ports_Utilization">
+            <event name="a">UNHALTED_CORE_CYCLES:T</event>
+            <event name="b">UOPS_EXECUTED.CORE_I1_C1</event>
+            <event name="d">CYCLE_ACTIVITY.STALLS_TOTAL</event>
+            <event name="f">UOPS_EXECUTED.CORE_C1</event>
+            <event name="g">UOPS_EXECUTED.CORE_C2</event>
+            <event name="h">UOPS_EXECUTED.CORE_C3</event>
+            <constant name="i">system.hyper_threads</constant>
+            <metric name="0_Ports_Utilized">100*(b/i)/(a/i)</metric>
+            <metric name="1_Port_Utilized">100*((f-g)/i)/(a/i)</metric>
+            <metric name="2_Ports_Utilized">100*((g-h)/i)/(a/i)</metric>
+            <metric name="3m_Ports_Utilized">100*(h/i)/(a/i)</metric>
+        </group>
+        <group name="Retiring">
+            <event name="a">UNHALTED_CORE_CYCLES:T</event>
+            <event name="b">UOPS_RETIRED.RETIRE_SLOTS</event>
+            <event name="c">IDQ.MS_UOPS</event>
+            <event name="d">UOPS_ISSUED.ANY</event>
+            <constant name="e">system.hyper_threads</constant>
+            <metric name="Base">100*((b/(4*(a/e)))-((b/d)*c/(4*(a/e))))</metric>
+            <metric name="Microcode_Sequencer">100*((b/d)*c/(4*(a/e)))</metric>
+        </group>
+        <group name="Base">
+            <event name="a">INST_RETIRED.X87</event>
+            <event name="b">FP_ARITH_INST_RETIRED.SCALAR_SINGLE</event>
+            <event name="c">FP_ARITH_INST_RETIRED.SCALAR_DOUBLE</event>
+            <event name="d">FP_ARITH_INST_RETIRED.128B_PACKED_SINGLE</event>
+            <event name="e">FP_ARITH_INST_RETIRED.128B_PACKED_DOUBLE</event>
+            <event name="f">FP_ARITH_INST_RETIRED.256B_PACKED_SINGLE</event>
+            <event name="g">FP_ARITH_INST_RETIRED.256B_PACKED_DOUBLE</event>
+            <event name="j">INSTRUCTION_RETIRED</event>
+            <event name="k">UOPS_RETIRED.RETIRE_SLOTS</event>
+            <metric name="FP_Arith">100*(((a*k/j)+(b+c+d+e+f+g))/k)</metric>
+            <metric name="Other">100*(1-(((a*k/j)+(b+c+d+e+f+g))/k))</metric>
+        </group>
+    </module>
+
+</byteperf>
