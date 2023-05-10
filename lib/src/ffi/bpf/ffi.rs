@@ -585,17 +585,18 @@ pub struct system_event_data {
     pub fs: system_event_fs,
     pub net: system_event_net,
     pub mem: system_event_mem,
+    pub sched: system_event_sched,
 }
 
 #[repr(C)]
 #[derive(Default, Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct system_event_gen {
     pub soft_lockup: ::std::os::raw::c_ulong,
-    pub hard_lockup: ::std::os::raw::c_ulong,
     pub rcu_stall: ::std::os::raw::c_ulong,
-    pub hung_task: ::std::os::raw::c_ulong,
     pub bad_page: ::std::os::raw::c_ulong,
     pub kernel_warn: ::std::os::raw::c_ulong,
+    pub mce_uc: ::std::os::raw::c_ulong,
+    pub panic_ts: ::std::os::raw::c_ulong,
 }
 
 #[repr(C)]
@@ -615,6 +616,7 @@ pub struct system_event_fs {
 pub struct system_event_net {
     pub xmit_timeout: ::std::os::raw::c_ulong,
     pub tcp_bad_csum: ::std::os::raw::c_ulong,
+    pub link_down: ::std::os::raw::c_ulong,
 }
 
 #[repr(C)]
@@ -623,18 +625,25 @@ pub struct system_event_mem {
     pub alloc_failure: ::std::os::raw::c_ulong,
 }
 
+#[repr(C)]
+#[derive(Default, Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq)]
+pub struct system_event_sched {
+    pub hung_task: ::std::os::raw::c_ulong,
+    pub coredump: ::std::os::raw::c_ulong,
+}
+
 #[test]
 fn bindgen_test_layout_system_event_data() {
     assert_eq!(
         ::std::mem::size_of::<system_event_data>(),
-        88usize,
+        112usize,
         concat!("Size of: ", stringify!(system_event_data))
     );
     assert_eq!(
         unsafe {
             &(*(::std::ptr::null::<system_event_data>())).gen.kernel_warn as *const _ as usize
         },
-        40usize,
+        24usize,
         concat!(
             "Offset of field: ",
             stringify!(system_event_data),
@@ -663,17 +672,13 @@ fn bindgen_test_layout_system_event_data() {
         )
     );
     assert_eq!(
-        unsafe {
-            &(*(::std::ptr::null::<system_event_data>()))
-                .net
-                .tcp_bad_csum as *const _ as usize
-        },
-        72usize,
+        unsafe { &(*(::std::ptr::null::<system_event_data>())).net.link_down as *const _ as usize },
+        80usize,
         concat!(
             "Offset of field: ",
             stringify!(system_event_data),
             "::",
-            stringify!(tcp_bad_csum)
+            stringify!(link_down)
         )
     );
     assert_eq!(
