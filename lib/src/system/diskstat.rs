@@ -16,6 +16,7 @@ limitations under the License.
 use log::warn;
 use nix::sys::statfs::*;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
@@ -102,12 +103,24 @@ impl Disk {
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
         let mut usage_vec: Vec<DiskUsage> = vec![];
+        let mut dev_filter = HashMap::new();
         for line in reader.lines() {
             // 36 35 98:0 /mnt1 /mnt2 rw,noatime master:1 - ext3 /dev/root rw,errors=continue
             // (1)(2)(3)   (4)   (5)      (6)      (7)   (8) (9)   (10)         (11)
             match line {
                 Ok(line) => {
                     let vec = line.split_whitespace().collect::<Vec<&str>>();
+                    let dev_id_idx = 2;
+                    if vec.len() <= dev_id_idx {
+                        warn!("[lib] disk usage with invalid mountinfo: {:?}", line);
+                        continue;
+                    }
+                    let dev_id = vec[dev_id_idx].parse::<String>().unwrap();
+                    if dev_filter.contains_key(&dev_id) {
+                        continue;
+                    }
+                    dev_filter.insert(dev_id, true);
+
                     let mount_point_idx = 4;
                     if vec.len() <= mount_point_idx {
                         warn!("[lib] disk usage with invalid mountinfo: {:?}", line);
