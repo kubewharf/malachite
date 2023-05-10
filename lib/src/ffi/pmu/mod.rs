@@ -26,12 +26,12 @@ use crate::ffi::pmu::ffi::{
 use crate::ffi::{ModuleMask, ModuleMaskConfig};
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
+use std::env;
 use std::error::Error;
 use std::ffi::CString;
 use std::sync::Once;
 use std::thread::sleep;
 use std::time::Duration;
-use std::env;
 
 pub(crate) mod ffi;
 
@@ -73,9 +73,9 @@ impl Default for byteperf_cpu_buffer_malachite {
         byteperf_cpu_buffer_malachite {
             cpu: 0,
             cpi: 0.0,
-            instructions: 0.0,
-            cycles: 0.0,
-            l3_misses: 0.0,
+            instructions: 0,
+            cycles: 0,
+            l3_misses: 0,
             utilization: 0.0,
         }
     }
