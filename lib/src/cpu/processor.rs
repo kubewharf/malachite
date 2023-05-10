@@ -112,9 +112,9 @@ impl ProcessorSchedStatData {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ProcessorCPIData {
     cpi: f64,
-    instructions: f64,
-    cycles: f64,
-    l3_misses: f64,
+    instructions: ::std::os::raw::c_ulong,
+    cycles: ::std::os::raw::c_ulong,
+    l3_misses: ::std::os::raw::c_ulong,
     utilization: f64,
 }
 
@@ -122,9 +122,9 @@ impl Default for ProcessorCPIData {
     fn default() -> Self {
         ProcessorCPIData {
             cpi: 0.0,
-            instructions: 0.0,
-            cycles: 0.0,
-            l3_misses: 0.0,
+            instructions: 0,
+            cycles: 0,
+            l3_misses: 0,
             utilization: 0.0,
         }
     }
@@ -134,9 +134,9 @@ impl ProcessorCPIData {
     pub fn update(
         &mut self,
         cpi: f64,
-        instructions: f64,
-        cycles: f64,
-        l3_misses: f64,
+        instructions: ::std::os::raw::c_ulong,
+        cycles: ::std::os::raw::c_ulong,
+        l3_misses: ::std::os::raw::c_ulong,
         utilization: f64,
     ) {
         self.cpi = cpi;
@@ -200,9 +200,9 @@ impl Processor {
     pub(crate) fn update_cpu_cpi(
         &mut self,
         cpi: f64,
-        instructions: f64,
-        cycles: f64,
-        l3_misses: f64,
+        instructions: ::std::os::raw::c_ulong,
+        cycles: ::std::os::raw::c_ulong,
+        l3_misses: ::std::os::raw::c_ulong,
         utilization: f64,
     ) {
         if self.processor_cpi_data.is_none() {

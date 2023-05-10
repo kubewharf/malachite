@@ -276,9 +276,9 @@ fn bindgen_test_layout_byteperf_hardware_malachite() {
 pub struct byteperf_cpu_buffer_malachite {
     pub cpu: ::std::os::raw::c_uint,
     pub cpi: f64,
-    pub instructions: f64,
-    pub cycles: f64,
-    pub l3_misses: f64,
+    pub instructions: ::std::os::raw::c_ulong,
+    pub cycles: ::std::os::raw::c_ulong,
+    pub l3_misses: ::std::os::raw::c_ulong,
     pub utilization: f64,
 }
 #[test]
