@@ -285,7 +285,7 @@ pub fn wrapper_get_cgroup_pmu_data(cgroup_path: PathBuf) -> pmu_data {
     let p_cgroup_pmu_data = Box::into_raw(box_cgroup_pmu_data);
     unsafe {
         let path = CString::new(cgroup_path.to_str().unwrap()).unwrap();
-        let ret = get_cgroup_pmu_data(path.as_ptr(), p_cgroup_pmu_data);
+        let ret = get_cgroup_pmu_data(path.as_ptr(), p_cgroup_pmu_data, 10);
         if ret != 0 {
             warn!(
                 "[ffi] bpf get_cgroup_pmu_data failed: {}, path= {}",

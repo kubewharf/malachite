@@ -833,7 +833,7 @@ impl System {
         if let Some(sub_sys) = ds_settings.get_sub_system(settings::SubSystemType::Cpu) {
             if sub_sys.is_enable() {
                 ebpf_enable_submodule.push("BPF_MODULE_ID_BPF_MODULE_CGROUP_SCHED".to_string());
-                //ebpf_enable_submodule.push("BPF_MODULE_ID_BPF_MODULE_PMU".to_string());
+                ebpf_enable_submodule.push("BPF_MODULE_ID_BPF_MODULE_PMU".to_string());
                 system_event_mask.enable_sched();
             } else {
                 info!("ebpf sub system cpu is disabled");

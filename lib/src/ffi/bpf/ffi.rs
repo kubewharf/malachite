@@ -530,14 +530,17 @@ fn bindgen_test_layout_mem_data() {
 pub struct pmu_data {
     pub cycles: ::std::os::raw::c_ulong,
     pub instructions: ::std::os::raw::c_ulong,
-    pub l3_misses: ::std::os::raw::c_ulong,
+    pub ocr_read_drams: ::std::os::raw::c_ulong,
+    pub store_ins: ::std::os::raw::c_ulong,
+    pub store_all_ins: ::std::os::raw::c_ulong,
+    pub imc_writes: ::std::os::raw::c_ulong,
 }
 
 #[test]
 fn bindgen_test_layout_pmu_data() {
     assert_eq!(
         ::std::mem::size_of::<pmu_data>(),
-        24usize,
+        48usize,
         concat!("Size of: ", stringify!(pmu_data))
     );
     assert_eq!(
@@ -566,13 +569,13 @@ fn bindgen_test_layout_pmu_data() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<pmu_data>())).l3_misses as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<pmu_data>())).ocr_read_drams as *const _ as usize },
         16usize,
         concat!(
             "Offset of field: ",
             stringify!(pmu_data),
             "::",
-            stringify!(l3_misses)
+            stringify!(ocr_read_drams)
         )
     );
 }
@@ -687,7 +690,7 @@ fn bindgen_test_layout_system_event_data() {
                 .mem
                 .alloc_failure as *const _ as usize
         },
-        80usize,
+        88usize,
         concat!(
             "Offset of field: ",
             stringify!(system_event_data),
@@ -800,6 +803,7 @@ extern "C" {
     pub fn get_cgroup_pmu_data(
         cgroup_path: *const ::std::os::raw::c_char,
         data: *mut pmu_data,
+        time: ::std::os::raw::c_ulong,
     ) -> ::std::os::raw::c_int;
 }
 
