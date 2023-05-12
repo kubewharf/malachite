@@ -27,12 +27,12 @@ fi
 echo $rust_platform_target
 RUSTFLAGS='-C target-feature=+crt-static' cargo build --target $rust_platform_target --release
 
-mkdir -p output/bin
+mkdir -p ./output/bin
 cp -r ./server/release/static/ ./output/bin
 cp ./target/$rust_platform_target/release/malachite ./output/bin
 
 ## copy byteperf & bpf config
-mkdir -p output/bin/static/pmu_config
+mkdir -p ./output/bin/static/pmu_config
 cp -r ./lib/src/ffi/pmu/byteperf/config/* ./output/bin/static/pmu_config/
 
 chmod +x ./output/bin/static/run_agent
