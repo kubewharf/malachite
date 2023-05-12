@@ -859,6 +859,7 @@ impl System {
             } else {
                 info!("ebpf sub system net is disabled");
                 sub_sys_disabled = true;
+                system_event_mask.enable_net();
             }
         }
 

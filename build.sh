@@ -35,8 +35,5 @@ cp ./target/$rust_platform_target/release/malachite ./output/bin
 mkdir -p output/bin/static/pmu_config
 cp -r ./lib/src/ffi/pmu/byteperf/config/* ./output/bin/static/pmu_config/
 
-## copy CHANGELOG
-cp -r ./CHANGELOG/ ./output
-
 chmod +x ./output/bin/static/run_agent
 chmod +x ./output/bin/malachite
