@@ -342,7 +342,10 @@ pub struct CpuCGroupV2 {
     update_time: u64,
     cycles: u64,
     instructions: u64,
-    l3_misses: u64,
+    ocr_read_drams: u64,
+    store_ins: u64,
+    store_all_ins: u64,
+    imc_writes: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
@@ -525,7 +528,7 @@ impl CpuCGroupV2 {
 
         if !is_bpf_moudule_valid(BPF_MODULE_CGROUP_PMU) {
             info!("bpf pmu module is invalid");
-        } else if let Err(e) = self.update_cgroup_cpi() {
+        } else if let Err(e) = self.update_cgroup_pmu() {
             warn!(
                 "[cpucg] update cgroup cpi with bpf error: {}, path= {}",
                 e,
@@ -534,13 +537,15 @@ impl CpuCGroupV2 {
         }
     }
 
-    pub fn update_cgroup_cpi(&mut self) -> common::Result<bool> {
+    pub fn update_cgroup_pmu(&mut self) -> common::Result<bool> {
         let user_path = PathBuf::from(&self.user_path);
         let pmu_data = wrapper_get_cgroup_pmu_data(user_path);
         self.cycles = pmu_data.cycles;
         self.instructions = pmu_data.instructions;
-        self.l3_misses = pmu_data.l3_misses;
-
+        self.ocr_read_drams = pmu_data.ocr_read_drams;
+        self.store_ins = pmu_data.store_ins;
+        self.store_all_ins = pmu_data.store_all_ins;
+        self.imc_writes = pmu_data.imc_writes;
         Ok(true)
     }
 
@@ -582,7 +587,10 @@ pub struct CpuCGroupV1 {
 
     cycles: u64,
     instructions: u64,
-    l3_misses: u64,
+    ocr_read_drams: u64,
+    store_ins: u64,
+    store_all_ins: u64,
+    imc_writes: u64,
 }
 
 impl CpuCGroupV1 {
@@ -698,13 +706,15 @@ impl CpuCGroupV1 {
         Ok(true)
     }
 
-    pub fn update_cgroup_cpi(&mut self) -> common::Result<bool> {
+    pub fn update_cgroup_pmu(&mut self) -> common::Result<bool> {
         let user_path = PathBuf::from(&self.user_path);
         let pmu_data = wrapper_get_cgroup_pmu_data(user_path);
         self.cycles = pmu_data.cycles;
         self.instructions = pmu_data.instructions;
-        self.l3_misses = pmu_data.l3_misses;
-
+        self.ocr_read_drams = pmu_data.ocr_read_drams;
+        self.store_ins = pmu_data.store_ins;
+        self.store_all_ins = pmu_data.store_all_ins;
+        self.imc_writes = pmu_data.imc_writes;
         Ok(true)
     }
 
@@ -760,7 +770,7 @@ impl CpuCGroupV1 {
 
         if !is_bpf_moudule_valid(BPF_MODULE_CGROUP_PMU) {
             info!("bpf pmu module is invalid");
-        } else if let Err(e) = self.update_cgroup_cpi() {
+        } else if let Err(e) = self.update_cgroup_pmu() {
             warn!(
                 "[cpucg] update cgroup cpi with bpf error: {}, path= {}",
                 e,
