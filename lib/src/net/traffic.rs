@@ -18,8 +18,9 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::ops::{Deref, DerefMut};
 use std::path::PathBuf;
+use utoipa::ToSchema;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, ToSchema)]
 pub struct NetworkCardTraffic {
     pub(crate) name: String,
     receive_bytes: u64,

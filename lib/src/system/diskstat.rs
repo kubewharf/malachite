@@ -20,8 +20,9 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
+use utoipa::ToSchema;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct DiskStat {
     primary_device_id: usize,
     secondary_device_id: usize,
@@ -31,7 +32,7 @@ pub struct DiskStat {
     io_busy: u64,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct DiskUsage {
     mount_point: String,
     filesystem_type: String,

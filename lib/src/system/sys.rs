@@ -23,6 +23,7 @@ use crate::ffi::bpf::ffi as bpf_ffi;
 use crate::ffi::pmu::ffi::{
     byteperf_cgroup_buffer_malachite, byteperf_cpu_buffer_malachite, byteperf_imc_buffer_malachite,
 };
+use crate::ffi::{WrapperBpfProgStat, WrapperSystemEvent};
 use crate::net::{NetInfo, Traffic};
 use crate::process::SystemProcessStats;
 use crate::settings;
@@ -41,6 +42,7 @@ use std::path::Path;
 use std::str;
 use std::{collections::HashMap, path::PathBuf};
 use strum::IntoEnumIterator;
+use utoipa::ToSchema;
 
 lazy_static! {
     pub static ref PAGE_SIZE_KB: u64 = unsafe { sysconf(_SC_PAGESIZE) as u64 / 1024 };
@@ -48,9 +50,10 @@ lazy_static! {
 
 pub type ProcessorId = usize;
 
-#[derive(Default, Clone, Deserialize, Serialize, Debug)]
+#[derive(Default, Clone, Deserialize, Serialize, Debug, ToSchema)]
 pub struct SystemEventData {
-    event_data: bpf_ffi::system_event_data,
+    /// system critical event
+    event_data: WrapperSystemEvent,
     update_time: u64,
 }
 impl SystemEventData {
@@ -59,9 +62,9 @@ impl SystemEventData {
     }
 }
 
-#[derive(Default, Clone, Deserialize, Serialize, Debug)]
+#[derive(Default, Clone, Deserialize, Serialize, Debug, ToSchema)]
 pub struct BPFProgStats {
-    stats: Vec<bpf_ffi::bpf_program_stats>,
+    stats: Vec<WrapperBpfProgStat>,
     update_time: u64,
 }
 impl BPFProgStats {
@@ -225,7 +228,10 @@ impl System {
             memory_idle_bandwidth: f64,
             memory_read_latency: f64,
             memory_write_latency: f64,
+            memory_read_latency_max: f64,
+            memory_write_latency_max: f64,
             channels: Vec<ImcChannelInfo>,
+            cnt: u32,
         }
 
         let mut perf_numa_data: HashMap<usize, NumaDataTrans> = HashMap::new();
@@ -241,7 +247,10 @@ impl System {
                         memory_idle_bandwidth: 0.0,
                         memory_read_latency: 0.0,
                         memory_write_latency: 0.0,
+                        memory_read_latency_max: 0.0,
+                        memory_write_latency_max: 0.0,
                         channels: Vec::new(),
+                        cnt: 0,
                     });
 
             entry.memory_idle_bandwidth += imc_data.memory_idle_bandwidth;
@@ -249,6 +258,13 @@ impl System {
             entry.memory_read_bandwidth += imc_data.memory_read_bandwidth;
             entry.memory_read_latency += imc_data.memory_read_latency;
             entry.memory_write_latency += imc_data.memory_write_latency;
+            if imc_data.memory_read_latency > entry.memory_read_latency_max {
+                entry.memory_read_latency_max = imc_data.memory_read_latency;
+            }
+            if imc_data.memory_write_latency > entry.memory_write_latency_max {
+                entry.memory_write_latency_max = imc_data.memory_write_latency;
+            }
+            entry.cnt += 1;
 
             let channel_name: String = unsafe {
                 CStr::from_ptr(imc_data.name.as_ptr())
@@ -277,8 +293,10 @@ impl System {
                         perf_numa_entry.memory_read_bandwidth,
                         perf_numa_entry.memory_write_bandwidth,
                         perf_numa_entry.memory_idle_bandwidth,
-                        perf_numa_entry.memory_read_latency,
-                        perf_numa_entry.memory_write_latency,
+                        perf_numa_entry.memory_read_latency / (perf_numa_entry.cnt as f64),
+                        perf_numa_entry.memory_write_latency / (perf_numa_entry.cnt as f64),
+                        perf_numa_entry.memory_read_latency_max,
+                        perf_numa_entry.memory_write_latency_max,
                         perf_numa_entry.channels.clone(),
                     );
                 }

@@ -21,8 +21,9 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::ops::Deref;
 use std::path::PathBuf;
+use utoipa::ToSchema;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct NumaNode {
     id: usize,
     path: PathBuf,
@@ -35,11 +36,16 @@ pub struct NumaNode {
     mem_file_pages: u64,
     mem_read_bandwidth_mb: f64,
     mem_write_bandwidth_mb: f64,
+    /// avg, backward compatibility
     mem_read_latency: f64,
+    /// avg, backward compatibility
     mem_write_latency: f64,
     mem_mx_bandwidth_mb: f64,
     mem_theory_mx_bandwidth_mb: f64,
+    /// bandwidth and latency per channel
     channels: Vec<ImcChannelInfo>,
+    mem_read_latency_max: f64,
+    mem_write_latency_max: f64,
 }
 
 impl NumaNode {
@@ -67,6 +73,8 @@ impl NumaNode {
             mem_mx_bandwidth_mb: 0.0,
             mem_theory_mx_bandwidth_mb: 0.0,
             channels: Vec::new(),
+            mem_read_latency_max: 0.0,
+            mem_write_latency_max: 0.0,
         }
     }
 
@@ -81,23 +89,19 @@ impl NumaNode {
         mem_read_bandwidth_mb: f64,
         mem_write_bandwidth_mb: f64,
         mem_theory_mx_bandwidth_mb: f64,
-        mem_read_latency: f64,
-        mem_write_latency: f64,
+        mem_read_latency_avg: f64,
+        mem_write_latency_avg: f64,
+        mem_read_latency_max: f64,
+        mem_write_latency_max: f64,
         channels: Vec<ImcChannelInfo>,
     ) {
-        if mem_theory_mx_bandwidth_mb == 0.0
-            && mem_write_bandwidth_mb == 0.0
-            && mem_read_bandwidth_mb == 0.0
-            && mem_read_latency == 0.0
-            && mem_write_latency == 0.0
-        {
-            return;
-        }
         self.mem_read_bandwidth_mb = mem_read_bandwidth_mb;
         self.mem_write_bandwidth_mb = mem_write_bandwidth_mb;
         self.mem_theory_mx_bandwidth_mb = mem_theory_mx_bandwidth_mb;
-        self.mem_read_latency = mem_read_latency;
-        self.mem_write_latency = mem_write_latency;
+        self.mem_read_latency = mem_read_latency_avg;
+        self.mem_write_latency = mem_write_latency_avg;
+        self.mem_read_latency_max = mem_read_latency_max;
+        self.mem_write_latency_max = mem_write_latency_max;
         self.channels = channels;
     }
 
@@ -164,7 +168,7 @@ impl NumaNode {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct ImcChannelInfo {
     channel_name: String,
     mem_read_bandwidth: f64,

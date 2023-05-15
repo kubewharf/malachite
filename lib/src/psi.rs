@@ -15,8 +15,9 @@ limitations under the License.
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use utoipa::ToSchema;
 
-#[derive(Clone, Debug, Copy, Deserialize, Serialize)]
+#[derive(Clone, Debug, Copy, Deserialize, Serialize, ToSchema)]
 pub struct PSIItem {
     avg10: f64,
     avg60: f64,
@@ -47,7 +48,7 @@ impl PSIItem {
     }
 }
 
-#[derive(Clone, Debug, Copy, Deserialize, Serialize)]
+#[derive(Clone, Debug, Copy, Deserialize, Serialize, ToSchema)]
 pub struct PressureStallInfo {
     some: Option<PSIItem>,
     full: Option<PSIItem>,

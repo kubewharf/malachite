@@ -19,8 +19,9 @@ use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
+use utoipa::ToSchema;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, ToSchema)]
 pub struct MemoryInfo {
     mem_total: u64,
     mem_free: u64,

@@ -25,6 +25,7 @@ extern crate rocket;
 mod monitor {
     use crate::system::{ChangeEvent, CHANGE_CHANNEL, MONITOR};
     use lib::settings;
+    use log::info;
     use std::ops::DerefMut;
     use std::process;
     use std::thread::{self, sleep};
@@ -42,54 +43,54 @@ mod monitor {
         .unwrap();
 
         loop {
-            let writer_lock = MONITOR.get_monitor_writer();
-            let reader_lock = MONITOR.get_monitor_reader();
-
-            {
-                let mut writer_instance = writer_lock.write();
-                info!("[moniter] updating instance {}", writer_instance.nr);
-                writer_instance.update(reader_lock.read().clone());
-
-                let mut new_settings = None;
-                loop {
-                    let receiver = CHANGE_CHANNEL.get_channel_receiver();
-                    if receiver.is_empty() {
-                        break;
-                    }
-                    let msg = receiver.try_recv().unwrap();
-                    info!(
-                        "[monitor] instance {}, receive {:?}",
-                        writer_instance.nr, msg
-                    );
-                    match msg {
-                        ChangeEvent::CGroupEvent(cgroup) => {
-                            writer_instance.insert_cgroups_item(cgroup).unwrap();
-                        }
-                        ChangeEvent::SettingsEvent(s) => {
-                            new_settings = Some(s);
-                        }
-                    }
-                }
-
-                if let Some(s) = new_settings {
-                    info!("switch settings");
-                    MONITOR
-                        .get_settings()
-                        .write()
-                        .deref_mut()
-                        .update(*s.clone());
-                    writer_instance.switch(&s);
-                    //settings.Save();
-                }
-
-                let settings = MONITOR.get_settings().read().clone();
-                writer_instance.refresh(&settings);
-                info!("[monitor] update instance {} done", writer_instance.nr);
-            }
-
-            MONITOR.change_pointer();
+            thread::spawn(|| {
+                update_once();
+            });
             sleep(Duration::from_millis(10000));
+            MONITOR.change_pointer();
         }
+    }
+
+    fn update_once() {
+        let mut writer_instance = MONITOR.get_monitor_writer().write();
+        info!("[moniter] updating instance {}", writer_instance.nr);
+        writer_instance.update(MONITOR.get_monitor_reader().read().clone());
+
+        let mut new_settings = None;
+        loop {
+            let receiver = CHANGE_CHANNEL.get_channel_receiver();
+            if receiver.is_empty() {
+                break;
+            }
+            let msg = receiver.try_recv().unwrap();
+            info!(
+                "[monitor] instance {}, receive {:?}",
+                writer_instance.nr, msg
+            );
+            match msg {
+                ChangeEvent::CGroupEvent(cgroup) => {
+                    writer_instance.insert_cgroups_item(cgroup).unwrap();
+                }
+                ChangeEvent::SettingsEvent(s) => {
+                    new_settings = Some(s);
+                }
+            }
+        }
+
+        if let Some(s) = new_settings {
+            info!("switch settings");
+            MONITOR
+                .get_settings()
+                .write()
+                .deref_mut()
+                .update(*s.clone());
+            writer_instance.switch(&s);
+            //settings.Save();
+        }
+
+        let settings = MONITOR.get_settings().read().clone();
+        writer_instance.refresh(&settings);
+        info!("[monitor] update instance {} done", writer_instance.nr);
     }
 
     fn monitor() {
@@ -157,22 +158,96 @@ mod monitor {
 
 mod web_server {
     use crate::{cgroup, healthz, setting, system};
+    use lib;
+    use lib::cgroup as lib_cgroup;
     use rocket::{Build, Rocket};
+    use utoipa::OpenApi;
+    use utoipa_swagger_ui::SwaggerUi;
     #[launch]
     pub fn start() -> Rocket<Build> {
+        #[derive(OpenApi)]
+        #[openapi(
+            paths(
+                //hello,
+                system::compute,
+                system::network,
+                system::io,
+                system::memory,
+                system::system_event,
+                cgroup::get_cgroup_info,
+                healthz::health,
+            ),
+            components(
+                schemas(lib_cgroup::CGroup, lib::common::CGroupType, lib_cgroup::SubSystem, lib_cgroup::SubSystemType,
+                    lib_cgroup::MemoryCGroup,lib_cgroup::MemoryCGroupV1, lib_cgroup::MemoryCGroupV2, lib_cgroup::MemEventLocalV2,
+                    lib_cgroup::MemNumaStatsV2, lib_cgroup::MemStatsV2, lib_cgroup::MemoryCGroupNumaStat,
+                    lib_cgroup::CpuCGroup,lib_cgroup::CpuCGroupV1,lib_cgroup::CpuCGroupV2, lib_cgroup::CpuCGroupBasicInfo, lib_cgroup::CpuStatsV2,
+                    lib_cgroup::CpuSetCGroup, lib_cgroup::CpuSetCGroupV1, lib_cgroup::CpuSetCGroupV2,
+                    lib_cgroup::BlkIOCGroup,lib_cgroup::BlkIOCGroupV1,lib_cgroup::BlkIOCGroupV2,lib_cgroup::BlkIOMaxV2, lib_cgroup::BlkIOStatV2,
+                    lib::ffi::WrapperIoLatpcts, lib::ffi::IoPercentLatency, lib::ffi::WrapperFSData, lib::ffi::WrapperBpfProgStat, lib::ffi::WrapperSystemEvent,
+                    lib::ffi::WrapperSystemEventFS,lib::ffi::WrapperSystemEventGen,lib::ffi::WrapperSystemEventIO,lib::ffi::WrapperSystemEventMem,lib::ffi::WrapperSystemEventNet,lib::ffi::WrapperSystemEventSched,
+                    lib_cgroup::NetCGroup, lib::ffi::WrapperNetData,
+                    lib_cgroup::PerfEventCGroup,
+                    lib::psi::PressureStallInfo, lib::psi::PSIItem,
+                    lib::cpu::NodeVec, lib::cpu::ProcessorCPIData, lib::process::SystemProcessStats,
+                    lib::system::LoadAvg, lib::system::LoadAvgOperator, lib::system::BPFProgStats,
+                    lib::system::DiskStat, lib::system::DiskUsage,
+                    lib::system::NumaNode, lib::system::MemoryInfo, lib::system::ImcChannelInfo,
+                    lib::system::SystemEventData,
+                    lib::net::NetworkCardTraffic, lib::net::NetInfo,
+                    lib::settings::Settings, lib::settings::DataSourceProcFS, lib::settings::DataSourceSysFS,lib::settings::DataSourceCgroupFS,
+                    lib::settings::DataSourceBytePerf,lib::settings::DataSourceEBPF, lib::settings::DataSourceSubSys,
+                    system::RespCompute, system::RespComputeCpu, system::RespIo, system::RespMemory, system::RespNetwork, system::RespSystemEvent,
+                    healthz::Healths, 
+                )
+            ),
+            tags(
+                (name = "Malachite", description = "Malachite core OpenAPI.")
+            )
+        )]
+        struct ApiDoc;
+
         rocket::build()
+            .mount(
+                "/",
+                SwaggerUi::new("/swagger-ui/<_..>")
+                    .url("/api-docs/openapi.json", ApiDoc::openapi()),
+            )
+            //.mount("/", routes![hello])
             .attach(cgroup::cgroup_v1_router())
             .attach(system::system_v1_router())
             .attach(healthz::healthz_v1_router())
             .attach(setting::settings_v1_router())
     }
+
+    /*
+    /// hello world123
+    ///
+    /// hello world456
+    #[utoipa::path(
+        responses(
+            (status = 200, description = "hello test789", body = [MyString])
+        )
+    )]
+    #[get("/hello")]
+    fn hello() -> MyString {
+        MyString {
+            str: String::from("hello world"),
+        }
+    }
+
+    #[derive(Serialize, ToSchema, Responder, Debug)]
+    pub(super) struct MyString {
+        str: String,
+    }
+    */
 }
 
 mod init {
     use std::default::Default;
+    use std::env;
     use std::ops::Deref;
     use std::panic;
-    use std::env;
 
     pub fn init() {
         logs();

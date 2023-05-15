@@ -18,9 +18,10 @@ use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
+use utoipa::ToSchema;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-struct LoadAvgOperator {
+#[derive(Clone, Debug, Deserialize, Serialize, ToSchema)]
+pub struct LoadAvgOperator {
     one: u64,
     five: u64,
     fifteen: u64,
@@ -36,7 +37,7 @@ impl LoadAvgOperator {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, ToSchema)]
 pub struct LoadAvg {
     /// load within one minute.
     pub one: f64,
@@ -44,6 +45,7 @@ pub struct LoadAvg {
     pub five: f64,
     /// load within fifteen minutes.
     pub fifteen: f64,
+    /// operator for calculate loadavg
     operator: LoadAvgOperator,
 }
 

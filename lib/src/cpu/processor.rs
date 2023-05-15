@@ -20,6 +20,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::ops::{Deref, DerefMut, Sub};
 use std::path::PathBuf;
+use utoipa::ToSchema;
 
 ///  name：指示CPU核
 ///  user：用户态花费的时间
@@ -109,12 +110,12 @@ impl ProcessorSchedStatData {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct ProcessorCPIData {
     cpi: f64,
-    instructions: ::std::os::raw::c_ulong,
-    cycles: ::std::os::raw::c_ulong,
-    l3_misses: ::std::os::raw::c_ulong,
+    instructions: u64,
+    cycles: u64,
+    l3_misses: u64,
     utilization: f64,
 }
 
@@ -134,9 +135,9 @@ impl ProcessorCPIData {
     pub fn update(
         &mut self,
         cpi: f64,
-        instructions: ::std::os::raw::c_ulong,
-        cycles: ::std::os::raw::c_ulong,
-        l3_misses: ::std::os::raw::c_ulong,
+        instructions: u64,
+        cycles: u64,
+        l3_misses: u64,
         utilization: f64,
     ) {
         self.cpi = cpi;
@@ -192,7 +193,7 @@ impl Processor {
             self.sched_wait = (new_sched_wait_data - self.processor_sched_stat_info.sched_wait_data)
                 as f32
                 / diff as f32
-                / 1000000_f32;
+                / 1000000000_f32;
         }
         self.processor_sched_stat_info
             .update(new_sched_wait_data, now);
@@ -436,7 +437,7 @@ impl SystemProcessorInfo {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialOrd, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialOrd, PartialEq, Eq, Default, ToSchema)]
 pub struct NodeVec {
     meta: String,
     inner: Vec<usize>,

@@ -21,8 +21,9 @@ use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
+use utoipa::ToSchema;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct NetInfo {
     tcp_delay_acks: u64,
     tcp_listen_overflows: u64,
