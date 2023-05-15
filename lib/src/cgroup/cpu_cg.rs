@@ -32,8 +32,9 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::ops::Sub;
 use std::path::{Path, PathBuf};
+use utoipa::ToSchema;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub enum CpuSetCGroup {
     V1(CpuSetCGroupV1),
     V2(CpuSetCGroupV2),
@@ -89,7 +90,7 @@ pub fn new_cpuset_cgroup(
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct CpuSetCGroupV2 {
     full_path: PathBuf,
     pub(crate) mems: NodeVec,
@@ -154,7 +155,7 @@ impl CpuSetCGroupV2 {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct CpuSetCGroupV1 {
     full_path: PathBuf,
     pub(crate) mems: NodeVec,
@@ -222,7 +223,7 @@ impl CpuSetCGroupV1 {
     }
 }
 
-#[derive(Clone, Debug, Copy, Eq, PartialEq, Deserialize, Serialize)]
+#[derive(Clone, Debug, Copy, Eq, PartialEq, Deserialize, Serialize, ToSchema)]
 pub struct CpuCGroupBasicInfo {
     cpu_usage: u64,     // unit: ns
     cpu_user_time: u64, // unit: ns
@@ -266,7 +267,7 @@ impl Sub for CpuCGroupBasicInfo {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub enum CpuCGroup {
     V1(CpuCGroupV1),
     V2(CpuCGroupV2),
@@ -321,7 +322,7 @@ pub fn new_cpu_cgroup(mount_point: &str, user_path: &Path, cgroup_type: CGroupTy
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Default)]
+#[derive(Clone, Debug, Deserialize, Serialize, Default, ToSchema)]
 pub struct CpuCGroupV2 {
     full_path: PathBuf,
     user_path: PathBuf,
@@ -348,7 +349,7 @@ pub struct CpuCGroupV2 {
     imc_writes: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, ToSchema)]
 pub struct CpuStatsV2 {
     usage_usec: u64,
     user_usec: u64,
@@ -559,7 +560,7 @@ impl CpuCGroupV2 {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, Default)]
+#[derive(Clone, Debug, Deserialize, Serialize, Default, ToSchema)]
 pub struct CpuCGroupV1 {
     full_path: PathBuf,
     user_path: PathBuf,
@@ -577,6 +578,8 @@ pub struct CpuCGroupV1 {
     cpu_usage_ratio: f32,
     cpu_user_usage_ratio: f32,
     cpu_sys_usage_ratio: f32,
+
+    percpu_usage: Vec<u64>,
 
     cpu_nr_throttled: Option<u64>,
     cpu_nr_periods: Option<u64>,
@@ -718,6 +721,18 @@ impl CpuCGroupV1 {
         Ok(true)
     }
 
+    pub fn update_percpu_usage(&mut self) -> common::Result<bool> {
+        let mut path = PathBuf::from(&self.full_path);
+        path.push("cpuacct.usage_percpu");
+        let contents = fs::read_to_string(&path)?;
+        self.percpu_usage = contents
+            .split_whitespace()
+            .map(|x| x.parse::<u64>().unwrap())
+            .collect();
+
+        Ok(true)
+    }
+
     pub fn update(&mut self) {
         if let Err(e) = self.update_period_us() {
             warn!(
@@ -750,6 +765,13 @@ impl CpuCGroupV1 {
         if let Err(e) = self.update_cpu_shares() {
             warn!(
                 "[cpucg] update cpu shares error: {}, path= {}",
+                e,
+                self.full_path.display()
+            );
+        }
+        if let Err(e) = self.update_percpu_usage() {
+            warn!(
+                "[cpucg] update percpu usage error: {}, path= {}",
                 e,
                 self.full_path.display()
             );

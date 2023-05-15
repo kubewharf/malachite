@@ -15,18 +15,20 @@ limitations under the License.
 
 use crate::common;
 use crate::common::CGroupType;
-use crate::ffi::bpf::ffi::net_data;
-use crate::ffi::{is_bpf_moudule_valid, wrapper_get_cgroup_net_data, BPF_MODULE_CGROUP_NET};
+use crate::ffi::{
+    is_bpf_moudule_valid, wrapper_get_cgroup_net_data, WrapperNetData, BPF_MODULE_CGROUP_NET,
+};
 use log::{info, warn};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
+use utoipa::ToSchema;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct NetCGroup {
     full_path: PathBuf,
     user_path: PathBuf,
-    pub(crate) bpf_net_data: net_data,
-    pub(crate) old_bpf_net_data: net_data,
+    pub(crate) bpf_net_data: WrapperNetData,
+    pub(crate) old_bpf_net_data: WrapperNetData,
     update_time: u64,
 }
 

@@ -18,18 +18,12 @@ use crate::system;
 use lib::settings;
 use rocket::http::Status;
 use rocket::serde::json::Json;
-use rocket_basicauth::BasicAuth;
 use std::thread;
 
 #[post("/", data = "<setting>")]
 async fn update_settings(
-    auth: BasicAuth,
     setting: Json<settings::Settings>,
 ) -> Result<Json<Resp<String>>, Status> {
-    if auth.username != "malachite-user" || auth.password != "malachite-pswd" {
-        return Err(Status::Forbidden);
-    }
-
     thread::spawn(move || {
         let sender = system::CHANGE_CHANNEL.get_channel_sender().clone();
         sender

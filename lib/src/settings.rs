@@ -15,8 +15,9 @@ limitations under the License.
 
 use config::{Config, ConfigError, File};
 use serde::{Deserialize, Serialize};
-use strum::EnumIter;
 use std::env;
+use strum::EnumIter;
+use utoipa::ToSchema;
 
 pub trait DataSource {
     fn is_enable(&self) -> bool;
@@ -69,9 +70,9 @@ impl SubSystem for SubSystemDisabled {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash, ToSchema)]
 #[allow(unused)]
-struct DataSourceSubSys {
+pub struct DataSourceSubSys {
     enable: bool,
     interval: u64,
 }
@@ -91,9 +92,9 @@ impl Default for DataSourceSubSys {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash, ToSchema)]
 #[allow(unused)]
-struct DataSourceProcFS {
+pub struct DataSourceProcFS {
     enable: bool,
     cpu: DataSourceSubSys,
     mem: DataSourceSubSys,
@@ -135,9 +136,9 @@ impl DataSource for DataSourceProcFS {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash, ToSchema)]
 #[allow(unused)]
-struct DataSourceSysFS {
+pub struct DataSourceSysFS {
     enable: bool,
     cpu: DataSourceSubSys,
     mem: DataSourceSubSys,
@@ -179,9 +180,9 @@ impl DataSource for DataSourceSysFS {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash, ToSchema)]
 #[allow(unused)]
-struct DataSourceCgroupFS {
+pub struct DataSourceCgroupFS {
     enable: bool,
     cpu: DataSourceSubSys,
     mem: DataSourceSubSys,
@@ -223,9 +224,9 @@ impl DataSource for DataSourceCgroupFS {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash, ToSchema)]
 #[allow(unused)]
-struct DataSourceBytePerf {
+pub struct DataSourceBytePerf {
     enable: bool,
     cpu: DataSourceSubSys,
     mem: DataSourceSubSys,
@@ -267,9 +268,9 @@ impl DataSource for DataSourceBytePerf {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, PartialOrd, Eq, Hash, ToSchema)]
 #[allow(unused)]
-struct DataSourceEBPF {
+pub struct DataSourceEBPF {
     enable: bool,
     cpu: DataSourceSubSys,
     mem: DataSourceSubSys,
@@ -311,7 +312,7 @@ impl DataSource for DataSourceEBPF {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Deserialize, Serialize, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Deserialize, Serialize, Eq, Hash, ToSchema)]
 #[allow(unused)]
 pub struct Settings {
     enable: bool,

@@ -18,11 +18,12 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::error;
 use std::fs::File;
+use utoipa::ToSchema;
 
 pub static MOUNT_POINT: &str = "/sys/fs/cgroup";
 pub(crate) type Result<T> = std::result::Result<T, Box<dyn error::Error>>;
 
-#[derive(Clone, Debug, Copy, Eq, Deserialize, Serialize, PartialEq, Hash)]
+#[derive(Clone, Debug, Copy, Eq, Deserialize, Serialize, PartialEq, Hash, ToSchema)]
 pub enum CGroupType {
     V1,
     V2,

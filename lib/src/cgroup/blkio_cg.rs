@@ -16,9 +16,8 @@ limitations under the License.
 use crate::cgroup::utils;
 use crate::common;
 use crate::common::CGroupType;
-use crate::ffi::bpf::ffi::fs_data;
 use crate::ffi::{
-    is_bpf_moudule_valid, wrapper_get_cgroup_fs_data, wrapper_get_cgroup_io_latpcts,
+    is_bpf_moudule_valid, wrapper_get_cgroup_fs_data, wrapper_get_cgroup_io_latpcts, WrapperFSData,
     WrapperIoLatpcts, BPF_MODULE_CGROUP_FS, BPF_MODULE_CGROUP_IO,
 };
 use crate::psi::PressureStallInfo;
@@ -30,6 +29,7 @@ use std::collections::HashMap;
 use std::fmt::{self, Formatter};
 use std::fs;
 use std::path::{Path, PathBuf};
+use utoipa::ToSchema;
 
 pub fn new_blkio_cgroup(
     mount_point: &str,
@@ -62,7 +62,7 @@ pub fn new_blkio_cgroup(
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub enum BlkIOCGroup {
     V1(BlkIOCGroupV1),
     V2(BlkIOCGroupV2),
@@ -98,7 +98,7 @@ impl BlkIOCGroup {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct BlkIOCGroupV2 {
     full_path: PathBuf,
     user_path: PathBuf,
@@ -107,13 +107,13 @@ pub struct BlkIOCGroupV2 {
     io_pressure: PressureStallInfo,
     io_latency: HashMap<String, u64>,
     io_weight: HashMap<String, u64>,
-    pub(crate) bpf_fs_data: fs_data,
-    pub(crate) old_bpf_fs_data: fs_data,
+    pub(crate) bpf_fs_data: WrapperFSData,
+    pub(crate) old_bpf_fs_data: WrapperFSData,
     bpf_io_latency: WrapperIoLatpcts,
     update_time: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct BlkIOStatV2 {
     rbytes: u64,
     wbytes: u64,
@@ -123,7 +123,7 @@ pub struct BlkIOStatV2 {
     dios: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct BlkIOMaxV2 {
     rbps: u64,
     wbps: u64,
@@ -358,7 +358,7 @@ impl fmt::Display for BlkOperationType {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct BlkIOCGroupV1 {
     full_path: PathBuf,
     user_path: PathBuf,
@@ -366,8 +366,8 @@ pub struct BlkIOCGroupV1 {
     pub(crate) bps_details: HashMap<String, HashMap<BlkOperationType, u64>>,
     pub(crate) iops_total: u64,
     pub(crate) bps_total: u64,
-    pub(crate) bpf_fs_data: fs_data,
-    pub(crate) old_bpf_fs_data: fs_data,
+    pub(crate) bpf_fs_data: WrapperFSData,
+    pub(crate) old_bpf_fs_data: WrapperFSData,
     update_time: u64,
 }
 

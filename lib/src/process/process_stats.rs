@@ -17,8 +17,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
+use utoipa::ToSchema;
 
-#[derive(Clone, Debug, Deserialize, Serialize, Default)]
+#[derive(Clone, Debug, Deserialize, Serialize, Default, ToSchema)]
 pub struct SystemProcessStats {
     procs_running: Option<u64>,
     procs_blocked: Option<u64>,

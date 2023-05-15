@@ -21,6 +21,13 @@ use rocket::http::Status;
 use rocket::serde::json::Json;
 use std::ops::Deref;
 
+/// system cpu info
+#[utoipa::path(
+    context_path = "/api/v1/system",
+    responses(
+        (status = 200, description = "system compute api", body = [RespCompute])
+    )
+)]
 #[get("/compute")]
 async fn compute() -> Result<Json<Resp<RespCompute>>, Status> {
     let reader_lock = MONITOR.get_monitor_reader();
@@ -69,6 +76,13 @@ async fn compute() -> Result<Json<Resp<RespCompute>>, Status> {
     })))
 }
 
+/// system network info
+#[utoipa::path(
+    context_path = "/api/v1/system",
+    responses(
+        (status = 200, description = "system network api", body = [RespNetwork])
+    )
+)]
 #[get("/network")]
 async fn network() -> Result<Json<Resp<RespNetwork>>, Status> {
     let reader_lock = MONITOR.get_monitor_reader();
@@ -81,6 +95,13 @@ async fn network() -> Result<Json<Resp<RespNetwork>>, Status> {
     })))
 }
 
+/// system io info
+#[utoipa::path(
+    context_path = "/api/v1/system",
+    responses(
+        (status = 200, description = "system io api", body = [RespIo])
+    )
+)]
 #[get("/io")]
 async fn io() -> Result<Json<Resp<RespIo>>, Status> {
     let reader_lock = MONITOR.get_monitor_reader();
@@ -95,6 +116,13 @@ async fn io() -> Result<Json<Resp<RespIo>>, Status> {
     })))
 }
 
+/// system memory info
+#[utoipa::path(
+    context_path = "api/v1/system",
+    responses(
+        (status = 200, description = "system io api", body = [RespMemory])
+    )
+)]
 #[get("/memory")]
 async fn memory() -> Result<Json<Resp<RespMemory>>, Status> {
     let reader_lock = MONITOR.get_monitor_reader();
@@ -113,6 +141,13 @@ async fn memory() -> Result<Json<Resp<RespMemory>>, Status> {
     })))
 }
 
+/// system event info
+#[utoipa::path(
+    context_path = "api/v1/system",
+    responses(
+        (status = 200, description = "system event api", body = [SystemEventData])
+    )
+)]
 #[get("/system_event")]
 async fn system_event() -> Result<Json<Resp<SystemEventData>>, Status> {
     let reader_lock = MONITOR.get_monitor_reader();

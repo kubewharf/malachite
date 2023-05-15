@@ -27,6 +27,7 @@ use std::fs;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
+use utoipa::ToSchema;
 
 pub fn new_memory_cgroup(
     mount_point: &str,
@@ -52,9 +53,11 @@ pub fn new_memory_cgroup(
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub enum MemoryCGroup {
+    /// cgroup v1 info from cgroupfs
     V1(MemoryCGroupV1),
+    /// cgroup v1 info from cgroupfs
     V2(MemoryCGroupV2),
 }
 
@@ -99,7 +102,7 @@ impl MemoryCGroup {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct MemoryCGroupV2 {
     full_path: PathBuf,
     user_path: PathBuf,
@@ -118,7 +121,7 @@ pub struct MemoryCGroupV2 {
     update_time: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct MemEventLocalV2 {
     low: u64,
     high: u64,
@@ -127,7 +130,7 @@ pub struct MemEventLocalV2 {
     oom_kill: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct MemNumaStatsV2 {
     anon: u64,
     file: u64,
@@ -149,7 +152,7 @@ pub struct MemNumaStatsV2 {
     workingset_nodereclaim: u64,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct MemStatsV2 {
     anon: u64,
     file: u64,
@@ -368,8 +371,8 @@ impl MemoryCGroupV2 {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct MemoryCGroupNumaStat {
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct MemoryCGroupNumaStat {
     numa_name: String,
     total: Option<u64>,
     file: Option<u64>,
@@ -397,7 +400,7 @@ impl From<(&str, HashMap<&str, u64>)> for MemoryCGroupNumaStat {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct MemoryCGroupV1 {
     full_path: PathBuf,
     user_path: PathBuf,

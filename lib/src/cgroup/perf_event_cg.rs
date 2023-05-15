@@ -21,6 +21,7 @@ use log::{debug, info};
 use serde::{Deserialize, Serialize};
 use std::ffi::CStr;
 use std::path::{Path, PathBuf};
+use utoipa::ToSchema;
 
 pub fn new_perf_event_cgroup(
     mount_point: &str,
@@ -43,7 +44,7 @@ pub fn new_perf_event_cgroup(
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, ToSchema)]
 pub struct PerfEventCGroup {
     user_path: PathBuf,
     full_path: PathBuf,
@@ -166,8 +167,6 @@ mod tests_perf_event_cg {
             user_path
         ));
         let cpi: f64 = 1.0;
-        let icache_miss: f64 = 2.0;
-        let l2_cache_miss: f64 = 3.0;
         let l3_cache_miss: f64 = 4.0;
         let instructions: f64 = 5.0;
         let cycles: f64 = 6.0;

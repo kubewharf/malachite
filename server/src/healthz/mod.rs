@@ -16,10 +16,12 @@ limitations under the License.
 use crate::common::Resp;
 use crate::system;
 use lib::ffi::{ModuleMask, ModuleMaskIDType};
-use lib::settings;
+use lib::settings::Settings;
+use lib::common::CGroupType;
 use rocket::http::Status;
 use rocket::serde::json::Json;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Hash)]
 struct ModuleDetails {
@@ -28,15 +30,22 @@ struct ModuleDetails {
     enable_list: Vec<String>,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Hash)]
-struct Healths {
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Hash, ToSchema)]
+pub struct Healths {
     status: String,
     ebpf_mask: Vec<String>,
     perf_mask: Vec<String>,
-    cgroup_type: lib::common::CGroupType,
-    settings: Option<settings::Settings>,
+    cgroup_type: CGroupType,
+    settings: Option<Settings>,
 }
 
+/// malachite health
+#[utoipa::path(
+    context_path = "/v1/health",
+    responses(
+        (status = 200, description = "health api", body = [Healths])
+    )
+)]
 #[get("/")]
 async fn health() -> Result<Json<Resp<Healths>>, Status> {
     let mask = lib::ffi::wrapper_get_bpf_mask();

@@ -24,15 +24,15 @@ use crate::ffi::pmu::ffi::{
     byteperf_upi_buffer_malachite,
 };
 use crate::ffi::{ModuleMask, ModuleMaskConfig};
+use log::info;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
+use std::env;
 use std::error::Error;
 use std::ffi::CString;
 use std::sync::Once;
 use std::thread::sleep;
 use std::time::Duration;
-use std::env;
-use log::info;
 
 pub(crate) mod ffi;
 
@@ -239,7 +239,7 @@ pub fn wrapper_byteperf_setup_malachite() -> Result<(), Box<dyn Error>> {
             let _x = Box::from_raw(p_config);
             if code != 0 {
                 info!("byteperf_setup_malachite failed: {}", code);
-				info!("xml_root = {:?}", p.to_str().unwrap());
+                info!("xml_root = {:?}", p.to_str().unwrap());
                 is_failed = true;
             }
             let _ = CString::from_raw(xml_root);

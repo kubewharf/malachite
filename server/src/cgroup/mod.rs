@@ -16,14 +16,21 @@ limitations under the License.
 use crate::common::Resp;
 use crate::system;
 use lib::cgroup;
-use lib::cgroup::CGroup;
 use lib::common::MOUNT_POINT;
 use lib::settings;
 use rocket::http::Status;
 use rocket::serde::json::Json;
 use std::path::PathBuf;
 use std::thread;
+use utoipa;
 
+/// per cgroup info
+#[utoipa::path(
+    context_path = "/api/v1/cgroup",
+    responses(
+        (status = 200, description = "per cgroup API", body = [CGroup])
+    )
+)]
 #[get("/groups?<cgroup_user_path>")]
 async fn get_cgroup_info(cgroup_user_path: String) -> Result<Json<Resp<cgroup::CGroup>>, Status> {
     let reader_lock = system::MONITOR.get_monitor_reader();
@@ -35,7 +42,7 @@ async fn get_cgroup_info(cgroup_user_path: String) -> Result<Json<Resp<cgroup::C
     };
 
     let settings = system::MONITOR.get_settings().read().clone();
-    let mut cgroup = CGroup::new(MOUNT_POINT, PathBuf::from(&cgroup_user_path));
+    let mut cgroup = cgroup::CGroup::new(MOUNT_POINT, PathBuf::from(&cgroup_user_path));
 
     if let Some(ds_settings) = settings.get_data_source(settings::DataSourceType::CgroupFS) {
         if cgroup.update(&*ds_settings).is_err() {

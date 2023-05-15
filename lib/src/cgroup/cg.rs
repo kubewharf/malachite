@@ -26,6 +26,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
 use std::path::{Path, PathBuf};
+use utoipa::ToSchema;
 
 const SUB_SYSTEM_MEM_STR: &str = "memory";
 const SUB_SYSTEM_CPU_SET_STR: &str = "cpuset";
@@ -34,7 +35,7 @@ const SUB_SYSTEM_BLK_IOSTR: &str = "blkio";
 const SUB_SYSTEM_NET_STR: &str = "net_cls";
 const SUB_SYSTEM_PERF_EVENT_STR: &str = "perf_event";
 
-#[derive(Eq, PartialEq, Hash, Serialize, Deserialize, Clone, Debug)]
+#[derive(Eq, PartialEq, Hash, Serialize, Deserialize, Clone, Debug, ToSchema)]
 pub enum SubSystemType {
     Memory,
     Cpuset,
@@ -72,11 +73,15 @@ impl fmt::Display for SubSystemType {
 
 pub type CGroupUserPath = PathBuf;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, ToSchema)]
 pub struct CGroup {
+    /// cgroup fs mount point
     mount_point: PathBuf,
-    user_path: CGroupUserPath,
-    pub(crate) sub_system_groups: HashMap<SubSystemType, SubSystem>,
+    /// user cgroup relative path
+    user_path: PathBuf,
+    // cgroup sub systems
+    pub sub_system_groups: HashMap<SubSystemType, SubSystem>,
+    // cgroup v1 or v2
     cgroup_type: CGroupType,
 }
 
@@ -191,7 +196,7 @@ impl CGroup {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub enum SubSystem {
     Memory(MemoryCGroup),
     CpuSet(CpuSetCGroup),
