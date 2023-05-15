@@ -26,12 +26,13 @@ use crate::ffi::pmu::ffi::{
 use crate::ffi::{ModuleMask, ModuleMaskConfig};
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
-use std::env;
 use std::error::Error;
 use std::ffi::CString;
 use std::sync::Once;
 use std::thread::sleep;
 use std::time::Duration;
+use std::env;
+use log::info;
 
 pub(crate) mod ffi;
 
@@ -211,8 +212,9 @@ pub fn wrapper_byteperf_setup_malachite() -> Result<(), Box<dyn Error>> {
     let mut is_failed = false;
 
     WRAPPER_BYTEPERF_INIT_GATHER_FUNC.call_once(|| {
-        let mut p = env::current_dir().unwrap();
-        p.push("bin/static/pmu_config");
+        let mut p = env::current_exe().unwrap();
+        p.pop();
+        p.push("static/pmu_config");
         let xml_root = CString::new(p.to_str().unwrap()).unwrap().into_raw();
         let xml_module = CString::new("basic").unwrap().into_raw();
 
@@ -236,7 +238,8 @@ pub fn wrapper_byteperf_setup_malachite() -> Result<(), Box<dyn Error>> {
             let code = byteperf_setup_malachite(p_config);
             let _x = Box::from_raw(p_config);
             if code != 0 {
-                println!("byteperf_setup_malachite failed: {}", code);
+                info!("byteperf_setup_malachite failed: {}", code);
+				info!("xml_root = {:?}", p.to_str().unwrap());
                 is_failed = true;
             }
             let _ = CString::from_raw(xml_root);
