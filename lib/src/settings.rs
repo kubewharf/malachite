@@ -16,6 +16,7 @@ limitations under the License.
 use config::{Config, ConfigError, File};
 use serde::{Deserialize, Serialize};
 use strum::EnumIter;
+use std::env;
 
 pub trait DataSource {
     fn is_enable(&self) -> bool;
@@ -336,8 +337,11 @@ impl Default for Settings {
 
 impl Settings {
     pub fn new() -> Result<Settings, ConfigError> {
+        let mut p = env::current_exe().unwrap();
+        p.pop();
+        p.push("static/config/default");
         let s = Config::builder()
-            .add_source(File::with_name("bin/static/config/default"))
+            .add_source(File::with_name(&p.into_os_string().into_string().unwrap()))
             .build()?;
 
         s.try_deserialize()

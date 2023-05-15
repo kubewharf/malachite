@@ -172,6 +172,7 @@ mod init {
     use std::default::Default;
     use std::ops::Deref;
     use std::panic;
+    use std::env;
 
     pub fn init() {
         logs();
@@ -179,7 +180,10 @@ mod init {
     }
 
     fn logs() {
-        log4rs::init_file("bin/static/config/log4rs.toml", Default::default()).unwrap();
+        let mut p = env::current_exe().unwrap();
+        p.pop();
+        p.push("static/config/log4rs.toml");
+        log4rs::init_file(p, Default::default()).unwrap();
     }
 
     fn panic_hook() {
